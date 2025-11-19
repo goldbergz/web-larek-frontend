@@ -1,0 +1,21 @@
+import { IComponent } from "../base/Model";
+
+export interface IHeader extends IComponent {
+  updateCartCount(count: number): void;
+  setActivePage(page: string): void;
+  onLogoClick?(callback: () => void): void;
+  onCartClick?(callback: () => void): void;
+  onNavigationClick?(callback: (page: string) => void): void;
+}
+
+export interface ICartCounter extends IComponent {
+  updateCount(count: number): void;
+  setVisible(isVisible: boolean): void;
+  onClick?(callback: () => void): void;
+}
+
+export interface ILogo extends IComponent {
+  onClick?(callback: () => void): void;
+  setText(text: string): void;
+  setImage(url: string): void;
+}

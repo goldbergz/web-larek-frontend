@@ -3,7 +3,7 @@ export type OrderResponse = {
 	id: string;
 };
 
-interface Product {
+export interface Product {
   id: string;
   description: string;
   image: string;
@@ -12,28 +12,28 @@ interface Product {
   price: string
 }
 
-interface PaymentSettings {
+export interface PaymentSettings {
   paymentType: "online" | "upon receipt";
   address: string
 }
 
-interface PaymentContacts {
+export interface PaymentContacts {
   email: string;
   phone: string
 }
 
-interface OrderSettings {
+export interface OrderSettings {
   paymentSettings: PaymentSettings;
   paymentContacts: PaymentContacts
 }
 
-interface Order extends OrderSettings {
+export interface Order extends OrderSettings {
   products: Product[];
   totalPrice: number
 }
 
 export interface ProductApiClient {
   getProducts: () => Promise<Product[]>;
-  getProduct: () => Promise<Product>;
+  getProduct: (id: string) => Promise<Product>;
   createOrder: (order: Order) => Promise<OrderResponse>;
 }
