@@ -1,6 +1,6 @@
-import { IComponent } from "../../base/Base";
+import { IView } from "../../base/View";
 
-export interface IInteractiveElement extends IComponent {
+export interface IInteractiveElement extends IView {
   setDisabled(disabled: boolean): void;
   setLoading(loading: boolean): void;
   onClick?(callback: (event: MouseEvent) => void): void;

@@ -1,6 +1,6 @@
-import { IComponent } from "../../base/Base";
+import { IView } from "../../base/View";
 
-export interface IHeader extends IComponent {
+export interface IHeader extends IView {
   updateCartCount(count: number): void;
   setActivePage(page: string): void;
   onLogoClick?(callback: () => void): void;
@@ -8,12 +8,8 @@ export interface IHeader extends IComponent {
   onNavigationClick?(callback: (page: string) => void): void;
 }
 
-export interface ICartCounter extends IComponent {
+export interface ICartCounter extends IView {
   updateCount(count: number): void;
   setVisible(isVisible: boolean): void;
   onClick?(callback: () => void): void;
-}
-
-export interface ILogo extends IComponent {
-  setImage(url: string): void;
 }

@@ -1,5 +1,5 @@
 import { IBasketItem } from "../../base/DataTypes";
-import { IModal } from "../../base/Base";
+import { IModal } from "../../base/View";
 
 export interface IBasketModal extends IModal {
   updateCart(items: IBasketItem[]): void;

@@ -1,15 +1,6 @@
 import { Order } from '../model/OrderModel';
 import { IProduct } from './DataTypes';
 
-export enum AppStateModals {
-	product = 'modal:product',
-  basket = 'modal:basket',
-  address = 'modal: address',
-	contacts = 'modal:contacts',
-	success = 'modal:success',
-	none = 'modal:none',
-}
-
 export enum AppEvents {
   PRODUCTS_LOADED = 'products:loaded',
   PRODUCT_SELECTED = 'product:selected',

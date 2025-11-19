@@ -18,3 +18,12 @@ export interface IBasketState {
   totalQuantity: number;
   totalPrice: number;
 }
+
+export type ValidationError = {
+  field: string;
+  message: string;
+};
+
+export interface IValidatable {
+  validate(): ValidationError[];
+}

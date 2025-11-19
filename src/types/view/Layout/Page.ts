@@ -1,5 +1,5 @@
-import { IComponent } from "../../base/Base";
+import { IView } from "../../base/View";
 
-export interface IPage extends IComponent {
+export interface IPagew extends IView {
   setContent(content: HTMLElement): void;
 }

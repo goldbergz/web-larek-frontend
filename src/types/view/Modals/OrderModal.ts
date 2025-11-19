@@ -1,4 +1,4 @@
-import { IModal } from "../../base/Base";
+import { IModal } from "../../base/View";
 import { PaymentSettings, PaymentContacts, OrderSettings } from "../../model/OrderModel";
 
 export interface IOrderModal extends IModal {
