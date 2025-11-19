@@ -10,5 +10,5 @@ export interface IApiClient {
 }
 
 export type ErrorState = {
-	error: string;
+	error: string | null;
 };

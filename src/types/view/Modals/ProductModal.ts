@@ -1,5 +1,5 @@
 import { IProduct } from "../../base/DataTypes";
-import { IModal } from "../../base/Model";
+import { IModal } from "../../base/Base";
 
 export interface IProductModal extends IModal {
   setProduct(product: IProduct): void;

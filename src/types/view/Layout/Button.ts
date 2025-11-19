@@ -1,4 +1,4 @@
-import { IComponent } from "../base/Model";
+import { IComponent } from "../../base/Base";
 
 export interface IInteractiveElement extends IComponent {
   setDisabled(disabled: boolean): void;

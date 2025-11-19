@@ -1,5 +1,5 @@
 import { IBasketItem, IProduct } from "../../base/DataTypes";
-import { IComponent } from "../../base/Model";
+import { IComponent } from "../../base/Base";
 
 export interface IProductCardView extends IComponent {
   setProduct(product: IProduct): void;

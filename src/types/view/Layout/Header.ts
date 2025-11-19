@@ -1,4 +1,4 @@
-import { IComponent } from "../base/Model";
+import { IComponent } from "../../base/Base";
 
 export interface IHeader extends IComponent {
   updateCartCount(count: number): void;
@@ -15,7 +15,5 @@ export interface ICartCounter extends IComponent {
 }
 
 export interface ILogo extends IComponent {
-  onClick?(callback: () => void): void;
-  setText(text: string): void;
   setImage(url: string): void;
 }

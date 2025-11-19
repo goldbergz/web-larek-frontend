@@ -1,4 +1,4 @@
-import { IComponent } from "../base/Model";
+import { IComponent } from "../../base/Base";
 
 export interface IPage extends IComponent {
   setContent(content: HTMLElement): void;

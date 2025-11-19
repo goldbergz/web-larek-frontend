@@ -25,7 +25,8 @@ export interface Order extends OrderSettings {
 export interface IOrderModel extends IModel<Order> {
   setPaymentSettings(settings: PaymentSettings): void;
   setContacts(contacts: PaymentContacts): void;
-  validatePaymentSettings(): boolean;
-  validateContacts(): boolean;
+  isPaymentSettingsValid(): boolean;
+  isContactsValid(): boolean;
+  validateOrder(): { isValid: boolean; errors: string[] };
   createOrder(cartItems: IBasketItem[]): Promise<OrderResponse>;
 }
