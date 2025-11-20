@@ -1,5 +1,5 @@
 import { IProduct } from "../base/DataTypes";
-import { Order } from "./OrderModel";
+import { Order } from "../base/DataTypes";
 
 export type OrderResponse = {
 	total: number;

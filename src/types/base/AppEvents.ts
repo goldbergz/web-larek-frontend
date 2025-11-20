@@ -1,5 +1,4 @@
-import { Order } from '../model/OrderModel';
-import { IProduct } from './DataTypes';
+import { Order } from './DataTypes';
 
 export enum AppEvents {
   PRODUCTS_LOADED = 'products:loaded',
@@ -22,18 +21,8 @@ export enum AppEvents {
   MODAL_CLOSE = 'modal:close',
 }
 
-export interface ProductData {
-  product: IProduct;
-}
-
-export interface BasketData {
-  product: IProduct;
-  items: IProduct[];
-  totalPrice: number;
-}
-
 export interface ModalData {
-  type: 'product' | 'cart' | 'order' | 'success';
+  type: 'product' | 'basket' | 'order' | 'success';
   data?: unknown;
 }
 

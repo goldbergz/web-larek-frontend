@@ -9,21 +9,25 @@ export interface IProduct {
 
 export interface IBasketItem {
   product: IProduct;
-  price: number;
-  quantity: number;
 }
 
-export interface IBasketState {
+export interface PaymentSettings {
+  paymentType: "online" | "upon receipt";
+  address: string;
+}
+
+export interface PaymentContacts {
+  email: string;
+  phone: string;
+}
+
+export interface OrderSettings {
+  paymentSettings: PaymentSettings;
+  paymentContacts: PaymentContacts;
+}
+
+export interface Order extends OrderSettings {
   items: IBasketItem[];
-  totalQuantity: number;
   totalPrice: number;
 }
 
-export type ValidationError = {
-  field: string;
-  message: string;
-};
-
-export interface IValidatable {
-  validate(): ValidationError[];
-}

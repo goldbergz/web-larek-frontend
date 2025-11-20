@@ -1,5 +1,5 @@
 import { IModal } from "../../base/View";
-import { PaymentSettings, PaymentContacts, OrderSettings } from "../../model/OrderModel";
+import { PaymentSettings, PaymentContacts, OrderSettings } from "../../base/DataTypes";
 
 export interface IOrderModal extends IModal {
   setStep(step: 'payment' | 'contacts' | 'success'): void;
