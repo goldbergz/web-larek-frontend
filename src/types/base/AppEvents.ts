@@ -6,9 +6,6 @@ export enum AppEvents {
   PRODUCT_ADD_TO_BASKET = 'product:add_to_basket',
   PRODUCT_REMOVE_FROM_BASKET = 'product:remove_from_basket',
   
-  BASKET_ADD = 'basket:add',
-  BASKET_REMOVE = 'basket:remove',
-  BASKET_UPDATE = 'basket:update',
   BASKET_OPEN = 'basket:open',
   
   ORDER_START = 'order:start',

@@ -52,100 +52,408 @@ yarn build
 
 ## Архитектура проекта
 
-### Базовые структуры данных
+1. База (base/)
+
+Базовые интерфейсы, общие для всех компонент.
+
+2. Типы данных (DataTypes)
+
+Сырые данные товара, корзины и состояния.
+
+3. Модели (model/)
+
+Логика и управление состоянием: продукты, корзина, заказы.
+
+4. API (ProductApi, ApiClient)
+
+Коммуникация с сервером.
+
+5. View (view/)
+
+Интерфейсы визуальных компонентов и модалок.
+
+6. AppEvents
+
+Описание событий и состояний
+
+### Базовые типы и интерфейсы (src/types/base/)
+#### API-клиент (Api.ts)
+
+```EnumApiMethods``` -  перечисление стандартизирует HTTP-методы, чтобы их не писать строками вручную. Это уменьшает ошибки и делает API-клиент типобезопасным.
+
+HTTP-методы:
+- POST
+- DELETE
+- GET
+
+```IApiClient``` - базовый контракт, который должны реализовать любые API-клиенты. Позволяет абстрагировать работу приложения от способа запроса (fetch/axios/mock).
+
+Методы:
+
+```get(uri: string): Promise<object>``` - Получает данные с сервера.
+Используется:
+- в ProductApiClient.getProducts()
+- в ProductApiClient.getProduct()
+
+```post(uri: string, data: object, method?: EnumApiMethods)``` - Отправляет данные на сервер:
+- создание заказа
+- отправка форм
+- обновления корзины (если бы были)
+
+```ErrorState``` - Описывает состояние ошибки при запросах или действиях модели.
+
+Используется в моделях:
+- чтобы хранить текст ошибки
+- показывать её во view
+
+#### События приложения (AppEvents.ts)
+```AppEvents``` - перечисление всех событий, которыми общаются:
+- модели
+- view-компоненты
+- контроллер
+- модальные окна
+
+Также обеспечивает слабую связанность между частями приложения.
+
+Товар:
+
+- PRODUCTS_LOADED - событие загрузки товаров с сервера.
+- PRODUCT_SELECTED - событие, отображающее, что товар выбран и открыта модалка этого товара.
+- PRODUCT_ADD_TO_BASKET - событие добавление товара в корзину.
+- PRODUCT_REMOVE_FROM_BASKET - событие удаление товара из корзины.
+
+Корзина:
+- BASKET_OPEN - событие, отображающее, что модалка корзины открыта.
+
+Заказ:
+- ORDER_START - начало оформления заказа.
+- ORDER_PAYMENT_SET - шаг заполнения платежной информации в заказе (1 шаг).
+- ORDER_CONTACTS_SET - шаг заполнения контактной информации в заказе (2 шаг).
+- ORDER_SUCCESS - отображение модлаки о успешном оформлении заказа.
+- ORDER_STEP_CHANGE - переключает модальные окна шагов оплаты.
+
+Модалки:
+- MODAL_OPEN - открывает конкретное модальное окно.
+- MODAL_CLOSE - закрывает конкретное модальное окно.
+
+```ModalData``` - тип передаваемых данных при открытии любой модалки.
+
+Параметры открываемой модалки:
+- ```type: "product" | "basket" | "order" | "success"``` - какой модалке открыться (в зависимости от события).
+- ```data?: unknown``` - что показать (товар, корзина, заказ).
+
+```OrderData``` - используется при переходах между шагами оформления заказа.
+
+Содержит:
+- текущий объект заказа
+- шаг: payment, contacts, success
+
+Позволяет:
+- переключать UI
+- валидировать шаги
+
+#### Типы данных доменной модели (DataTypes.ts)
+```IProduct``` - описание товара, приходящего с API и отображаемого пользователю.
+
+Используется в:
+- каталоге
+- карточках товара
+- модалке товара
+- корзине
+
+Товар:
+- id - уникальный идентификатор для поиска и действий
+- title - имя товара
+- description - подробное описание в модалке
+- image - ссылка на изображение
+- category - нужен для отображения категории товара
+- price - отображение суммы, расчёт итоговой цены в корзине
+
+```IBasketItem``` - единица товара в корзине(для удобного разделения товара в корзине от его отображения на главной старнице).
+
+Элемент корзины:
+- product: IProduct
+
+```PaymentSettings``` - данные первого шага оформления заказа.
+
+Шаг 1 — способ оплаты:
+- ```paymentType: "online" | "upon receipt"``` - выбранный способ оплаты
+- ```address: string``` - адрес доставки
+
+```PaymentContacts``` - данные второго шага оформления.
+
+Шаг 2 — контакты:
+- email: string
+- phone: string
+
+Используется:
+- для валидации перед оплатой
+- в createOrder()
+
+```OrderSettings``` - объединение данных двух шагов в единый объект.
 
 ```typescript
-// Основной товар
-interface IProduct {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  category: string;
-  price: number;
-}
-
-// Элемент корзины
-interface IBasketItem {
-  product: IProduct;
-}
-
-// Настройки корзины
-export interface PaymentSettings {
-  paymentType: "online" | "upon receipt";
-  address: string;
-}
-
-export interface PaymentContacts {
-  email: string;
-  phone: string;
-}
-
-export interface OrderSettings {
+{
   paymentSettings: PaymentSettings;
   paymentContacts: PaymentContacts;
 }
+```
 
-export interface Order extends OrderSettings {
-  items: IBasketItem[];
-  totalPrice: number;
+```Order``` - полное описание заказа, которое уходит на сервер.
+
+Общий объект заказа:
+- items - список товаров
+- totalPrice - итоговая цена
+- OrderSettings - данные обоих шагов оформления
+
+#### Базовые интерфейсы моделей (Model.ts)
+```IModel<T>``` - базовый интерфейс реактивной модели, которую можно слушать.
+
+Используется всеми моделями:
+- ProductModel
+- BasketModel
+- OrderModel
+
+Методы:
+- getState(): T — возвращает текущее состояние модели.
+- setState(newState: T): void — устанавливает новое состояние и вызывает всех слушателей.
+- addChangeListener(cb) — позволяет view подписаться на изменения модели.
+- removeChangeListener(cb) — прекращает отслеживать модель.
+
+#### Базовые интерфейсы отображений (View.ts)
+
+```IView``` - базовый интерфейс для всех UI-компонентов.
+
+- ```element: HTMLElement``` - DOM-узел
+- ```render(): HTMLElement``` - обновляет внешний вид view
+
+```IDataView<T>``` - универсальный интерфейс для рендеринга данных модели.
+
+- ```render(data: Partial<T>): HTMLElement``` - отрисовывает переданные данные (товар, корзина, заказ)
+
+Используется для карточек, списков, модалок.
+
+```IModal``` - общий интерфейс всех модальных окон.
+
+Свойства:
+- closeButton: HTMLButtonElement - кнопка закрытия модалки, которая есть во всех окнах
+- content?: HTMLElement - контент модалки
+
+Методы:
+- open() - показывает модалку
+- close() - скрывает модалку
+- isOpen(): boolean - проверяет состояние
+
+```IList<T>``` - отображение массивов данных. Переиспользуемый список для каталога и корзины.
+
+Свойства:
+-items: T[] - элементы списка
+
+Методы:
+- setItems(items: T[]) - задать новые элементы
+- getItems(): T[] - получить текущие элементы
+- onItemClick?(cb) - обработка клика по элементу (открытие модалки в каталоге)
+
+### Модели (src/types/model/)
+#### Модель корзины (BasketModel.ts)
+```IBasketState``` - хранит состояние корзины
+
+Состояние корзины:
+- items: IBasketItem[] - массив товаров
+- totalQuantity: number - общее количество товаров в корзине
+- totalPrice: number - общая стоимость всех отваров в корзине
+
+```IBasketModel``` - управляет состоянием корзины
+
+Расширяет IModel<IBasketState> и добавляет:
+
+Свойства:
+- items: IBasketItem[] - массив товаров
+
+Методы:
+- addProduct(product: IProduct) - добавляет товары в корзину
+- removeProduct(productId: string) - удаляет товары из корзины по айди
+- getItemCount(): number - вычисляет общее количетсво предметов
+- getTotalPrice(): number - вычисляет общую стоимость
+- isEmpty(): boolean - проверяет состояние корзины.
+
+#### Модель заказа (OrderModel.ts)
+```IOrderModel``` - управляет оформлением заказа — двумя шагами.
+
+Расширяет IModel<Order>.
+
+Методы:
+- setPaymentSettings(settings: PaymentSettings) - сохраняет данные первого шага.
+- setContacts(contacts: PaymentContacts) - сохраняет данные второго шага.
+- isPaymentSettingsValid(): boolean - проверяет:
+  - заполнен ли адрес
+  - выбран ли метод оплаты
+- isContactsValid(): boolean - проверяет:
+  - корректо заполнен email
+  - корректо заполнен номер
+- createOrder(items): Promise<OrderResponse> - отправляет заказ на сервер. Возвращает: OrderResponse (id заказа, сумма)
+
+```ValidationError```
+
+Ошибки валидации:
+```typescript
+{
+  field: string;
+  message: string;
 }
 ```
 
-### Модели (Models)
+#### API товаров (ProductApi.ts)
+```OrderResponse```
 
-1. ProductModel
-- Управляет каталогом товаров
-- Загружает данные через API
-- Предоставляет доступ к товарам по ID
+Ответ API:
+- total: number
+- id: string
 
-2. BasketModel
-- Управляет состоянием корзины
-- Добавляет/удаляет товары
-- Вычисляет общую стоимость
-- Синхронизирует состояние между компонентами
+```ProductApiClient``` - централизованный HTTP-клиент. Обрабатывает GET/POST запросы. Преобразует ответы сервера
 
-3. OrderModel
-- Управляет процессом оформления заказа
-- Валидирует данные оплаты и контактов
-- Создает заказ через API
+Методы API:
+- getProducts(): Promise<IProduct[]>
+- getProduct(id): Promise<IProduct>
+- createOrder(order: Order): Promise<OrderResponse>
 
-### Представления (Views)
+#### Модель товаров (ProductModel.ts)
+```IProductModel``` - хранит список товаров, работает с API.
 
-#### Базовые компоненты:
+Расширяет IModel<IProduct[]>.
 
-```IView``` - базовый интерфейс для всех UI-компонентов
+Свойства:
+- products: IProduct[] - хранит каталог товаров
 
-```IDataView<T>``` - универсальный интерфейс для рендеринга данных модели
+Методы:
+- loadProducts() - загружает данные через API
+- getProductById(id) - предоставляет доступ к товарам по ID
 
-```IModal``` - унифицированный интерфейс модальных окон
 
-```IList<T>``` - переиспользуемый список для каталога и корзины
 
-#### Специализированные компоненты:
+### Интерфейсы представлений (src/types/view/)
+#### Layout
+```IInteractiveElement``` - для кнопок, интерактивных элементов.
 
-```ProductListView``` - отображает каталог товаров
+Наследует IView.
 
-```BasketListView``` - отображает содержимое корзины
+Методы:
+- setDisabled - запрещает взаимодействие (важно в шагах заказа)
+- onClick? - реакция на клик
 
-```ProductModal``` - модеальное окно с детальной информацией о товаре
+```IButton```
 
-```OrderModal``` - модеальное окно с многошаговым оформлением заказа
+Расширяет IInteractiveElement.
 
-```BasketModal``` - модеальное окно корзины
+Методы:
+- setText(text) - смена текста кнопки
 
-### Сервисы
+```IHeader``` - отображения шапки страницы
 
-1. ApiClient
-- Централизованный HTTP-клиент
-- Обрабатывает GET/POST запросы
-- Преобразует ответы сервера
+Методы:
+- updateBasketCount - обновление счетчика товаров в корзине в шапке
+- onLogoClick? - визуальная реакция на клик по лого
+- onBasketClick? - визуальная реакция на клик по корзине
 
-2. AppEvents
-- Управляет событиями между компонентами
-- Обеспечивает слабую связанность
+```IPage``` - оборачивает разные страницы приложения.
 
-## Взаимодействие компонентов
+Методы:
+- setContent(content) - заменяет контент страницы
+
+#### Lists
+```IBasketListView``` - отображает список товаров в корзине.
+
+Наследует IList<IBasketItem>.
+
+Дополнительно:
+- onUpdateQuantity?(cb) - изменение количества
+- onRemoveItem?(cb) - удалить товар
+
+```IProductListView``` - отображает список товаров на главной странице.
+
+Наследует IList<IProduct>.
+
+Дополнительно:
+- onProductClick?(cb) - открытие товара
+
+#### Modals
+```IBasketModal``` - отображение модалки корзины.
+
+Наследует IModal.
+
+Методы:
+- updateBasket(items) - полностью перерисовать список в модалке (при удалении/добавлении)
+- onUpdateTotalSum?(cb) - обновлять сумму товаров
+
+
+```IProductModal``` - показывает подробную информацию о товаре.
+
+Методы:
+- setProduct(product) - заполнение модалки
+- onAddToBasket?(cb) - добавить в корзину через модалку
+- onRemoveFromBasket?(cb) - убрать товар из корзины через модалку
+
+```IOrderModal``` - отображение шаглв оформлени заказа.
+
+Методы:
+- setStep(step) - переключить шаг оформления
+- setPaymentData(data) - заполнить UI шаг 1
+- setContactsData(data) - заполнить UI шаг 2
+- setSuccessData(total, orderId)
+- onNextStep?(cb) - переход на следующий шаг
+- onPreviousStep?(cb) - назад
+- onSubmit?(cb) - отправка заказа, переход на окно success
+
+#### Cards
+```IProductCardView``` - отображение товара в карточке
+
+Наследует IDataView<IProduct>.
+
+Методы:
+- setProduct(product) - показать данные товара
+
+```IBasketItemView``` - отображение товара в корзине
+
+Наследует IDataView<IBasketItem>.
+
+Методы:
+- setBasketItem(item) - показать данные товара в корзине
+
+```IProductModalView``` - отображение товара в модалке о товаре
+
+Наследует IDataView<IProduct>.
+
+Методы:
+- setProduct(product)- показать данные товара в модалке
+- setInBasket(boolean) - проверка, есть ли товар в корзине, для корректного отображения кнопки "Добавить в корзину"
+
+
+### Взаимодействие всех типов между собой
+#### Модели ↔ Представления
+- ProductModel загружает товары → AppEvents.PRODUCTS_LOADED → ProductListView.render(products[]).
+- ProductModalView читает данные из ProductModel.
+
+#### Корзина (BasketModel)
+- Хранит items, totalPrice.
+- Предоставляет методы добавления/удаления.
+- На любое изменение вызывает AppEvents.BASKET_UPDATE.
+- Этим событием обновляются:
+  - Header
+  - BasketModal
+  - BasketListView
+
+#### Оформление заказа (OrderModel)
+
+Поток:
+- setPaymentSettings()
+- setContacts()
+- reateOrder()
+
+После createOrder():
+- вызывает ORDER_SUCCESS
+- BasketModel очищается
+- OrderModal показывает успех
+
 #### Процесс просмотра и добавления товара:
 1. ProductModel загружает товары через ApiClient
 2. ProductListView отображает каталог, используя ProductCard компоненты
