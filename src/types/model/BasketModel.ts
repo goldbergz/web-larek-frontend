@@ -12,7 +12,7 @@ export interface IBasketModel extends IModel<IBasketState> {
   
   addProduct(product: IProduct): void;
   removeProduct(productId: string): void;
-  getItemCount(): number;
-  getTotalPrice(): number;
+  getTotalPrice(): number
+  getItemCount(): number
   isEmpty(): boolean;
 }

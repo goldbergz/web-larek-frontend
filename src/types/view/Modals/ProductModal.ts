@@ -1,8 +1,9 @@
 import { IProduct } from "../../base/DataTypes";
-import { IModal } from "../../base/View";
+import { IDataView } from "../../base/View";
 
-export interface IProductModal extends IModal {
+export interface IProductModalView extends IDataView<IProduct> {
   setProduct(product: IProduct): void;
-  onAddToBasket?(callback: (product: IProduct) => void): void;
-  onRemoveFromBasket?(callback: (productId: string) => void): void;
+  setInBasket(isInBasket: boolean): void;
+  onAddToBasket(callback: (product: IProduct) => void): void;
+  onRemoveFromBasket(callback: (product: IProduct) => void): void;
 }

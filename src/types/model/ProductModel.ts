@@ -4,6 +4,6 @@ import { IModel } from "../base/Model";
 export interface IProductModel extends IModel<IProduct[]> {
   products: IProduct[];
 
-  loadProducts(): Promise<void>;
+  setProducts(products: IProduct[]): void;
   getProductById(id: string): IProduct | undefined;
 }

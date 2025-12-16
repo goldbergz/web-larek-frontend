@@ -1,12 +1,20 @@
-export enum EnumApiMethods {
+export enum ApiPostMethods {
 	POST = 'POST',
 	DELETE = 'DELETE',
-	GET = 'GET',
+	PUT = 'PUT',
 }
 
-export interface IApiClient {
-  get(uri: string): Promise<object>;
-  post(uri: string, data: object, method?: EnumApiMethods): Promise<object>;
+export interface IApi {
+  baseUrl: string;
+  options: RequestInit;
+
+  get<T>(uri: string): Promise<T>;
+  post<T>(
+    uri: string,
+    data: unknown,
+    method?: ApiPostMethods
+  ): Promise<T>;
+  handleResponse<T>(response: Response): Promise<T>
 }
 
 export type ErrorState = {

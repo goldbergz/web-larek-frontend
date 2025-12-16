@@ -1,11 +1,19 @@
-export interface IView {
+export interface IComponent {
   element: HTMLElement;
+
+  show(): void;
+  hide(): void;
+  setText(text: string): void;
+  setDisabled(disabled: boolean): void;
+  toggleClass(className: string, state: boolean): void;
+}
+
+export interface IView extends IComponent {
   render(): HTMLElement;
 }
 
-export interface IDataView<T> {
-  element: HTMLElement;
-  render(data: Partial<T>): HTMLElement;
+export interface IDataView<T> extends IView {
+  update(data: Partial<T>): HTMLElement;
 }
 
 export interface IModal extends IView{
