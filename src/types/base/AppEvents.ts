@@ -1,4 +1,4 @@
-import { Order } from './DataTypes';
+import { IBasketItem, IProduct, Order, PaymentContacts, PaymentSettings } from './DataTypes';
 
 export enum AppEvents {
   PRODUCTS_LOADED = 'products:loaded',
@@ -26,4 +26,27 @@ export interface ModalData {
 export interface OrderData {
   order: Order;
   step: 'payment' | 'contacts' | 'success';
+}
+
+export interface EventMap {
+  'products:loaded': { products: IProduct[] };
+  'product:selected': { productId: string };
+  'product:add_to_basket': { product: IProduct };
+  'product:remove_from_basket': { productId: string };
+
+  'basket:open': void;
+  'basket:updated': {
+    items: IBasketItem[];
+    totalPrice: number;
+    totalQuantity: number;
+  };
+
+  'order:start': void;
+  'order:payment:set': PaymentSettings;
+  'order:contacts:set': PaymentContacts;
+  'order:success': { orderId: string; total: number };
+  'order:step:change': OrderData;
+
+  'modal:open': ModalData;
+  'modal:close': void;
 }
