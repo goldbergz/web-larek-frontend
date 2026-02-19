@@ -243,10 +243,15 @@ POST | PUT | DELETE
 
 **Поля**
 - products: IProduct[] — список товаров
+- isLoading: boolean - состояние загрузки
+- error?: string - возможные ошибки с сервера для их отображения
 
 **Методы**
 - ```setProducts(products: IProduct[]): void``` — устанавливает каталог
+- ```setLoading(loading: boolean): void``` — показывает пользователю, что данные загружаются
+- ```setError(error: string): void``` - хранить ошибку загрузки/сервера в state, чтобы view могла её отобразить
 - ```getProductById(id: string): IProduct | undefined``` - предоставляет доступ к товарам по ID
+
 
 ### Класс ```BasketModel```
 
