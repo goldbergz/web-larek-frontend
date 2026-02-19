@@ -278,21 +278,19 @@ POST | PUT | DELETE
 
 ```constructor()```
 
-**Поля**
-- paymentSettings?: PaymentSettings
-- paymentContacts?: PaymentContacts
-
 **Методы**
+- ```setStep(step: OrderStep): void``` - задает шаг формления заказа
 - ```setPaymentSettings(settings: PaymentSettings): void``` - сохраняет данные первого шага
 - ```setContacts(contacts: PaymentContacts): void``` - сохраняет данные второго шага
-- ```getOrderData(items: IBasketItem[]): Order```
+- ```setItems(items: IBasketItem[]): void``` - сохраняет товары в заказе
+- ```getOrderData(): Order```
 - ```validatePayment(): boolean``` - проверяет:
   - заполнен ли адрес
   - выбран ли метод оплаты
 - ```validateContacts(): boolean``` - проверяет:
   - корректо заполнен email
   - корректо заполнен номер
-
+- ```reset()``` -  сбрасывает данные заказа после успешного оформления
 Не отправляет заказ на сервер
 
 ## API-сервисы

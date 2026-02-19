@@ -3,16 +3,29 @@ import { IModel } from "../base/Model";
 
 export type OrderStep = 'payment' | 'contacts' | 'success';
 
-export interface IOrderModel extends 
-  IModel<Order> {
-  paymentSettings?: PaymentSettings;
-  paymentContacts?: PaymentContacts;
+export interface IOrderState {
+  step: OrderStep;
 
+  paymentSettings: PaymentSettings | null;
+  paymentContacts: PaymentContacts | null;
+
+  items: IBasketItem[];
+  totalPrice: number;
+
+  validationErrors: ValidationError[];
+}
+
+export interface IOrderModel extends 
+  IModel<IOrderState> {
+  
+  setStep(step: OrderStep): void;
   setPaymentSettings(settings: PaymentSettings): void;
   setContacts(contacts: PaymentContacts): void;
-  getOrderData(items: IBasketItem[]): Order
+  setItems(items: IBasketItem[]): void;
+  getOrderData(): Order
   validatePayment(): boolean;
   validateContacts(): boolean;
+  reset(): void;
 }
 
 export type ValidationError = {
