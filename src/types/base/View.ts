@@ -16,7 +16,7 @@ export interface IDataView<T> extends IView {
   update(data: Partial<T>): HTMLElement;
 }
 
-export interface IModal extends IView{
+export interface IModal<T = unknown> extends IDataView<T> {
   closeButton: HTMLButtonElement;
   content?: HTMLElement;
 
