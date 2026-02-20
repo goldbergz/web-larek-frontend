@@ -1,5 +1,5 @@
-import { IModal } from "../../types/base/View";
-import { DataView } from "./View";
+import { IModal } from "../../../types/base/View";
+import { DataView } from "../../base/View";
 
 export abstract class Modal
   extends DataView<unknown>

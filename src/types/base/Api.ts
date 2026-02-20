@@ -1,12 +1,13 @@
-export enum ApiPostMethods {
-	POST = 'POST',
-	DELETE = 'DELETE',
-	PUT = 'PUT',
-}
+export type ApiListResponse<Type> = {
+    total: number,
+    items: Type[]
+};
+
+export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
+
 
 export interface IApi {
   baseUrl: string;
-  options: RequestInit;
 
   get<T>(uri: string): Promise<T>;
   post<T>(
@@ -14,7 +15,6 @@ export interface IApi {
     data: unknown,
     method?: ApiPostMethods
   ): Promise<T>;
-  handleResponse<T>(response: Response): Promise<T>
 }
 
 export type ErrorState = {
