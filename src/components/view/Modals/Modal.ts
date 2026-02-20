@@ -7,11 +7,14 @@ export abstract class Modal
 {
   closeButton: HTMLButtonElement;
   content?: HTMLElement;
+  private pageWrapper: HTMLElement | null;
 
   protected _isOpen = false;
 
   constructor(element: HTMLElement) {
     super(element);
+
+    this.pageWrapper = document.querySelector<HTMLElement>('.page__wrapper');
 
     const closeBtn = element.querySelector<HTMLButtonElement>('.modal__close');
     if (!closeBtn) throw new Error('Modal close button not found');
@@ -27,12 +30,14 @@ export abstract class Modal
   }
 
   open(): void {
-    this.show();
+    this.toggleClass('modal_active', true);
+    this.pageWrapper?.classList.add('page__wrapper_locked');
     this._isOpen = true;
   }
 
   close(): void {
-    this.hide();
+    this.toggleClass('modal_active', false);
+    this.pageWrapper?.classList.remove('page__wrapper_locked');
     this._isOpen = false;
   }
 

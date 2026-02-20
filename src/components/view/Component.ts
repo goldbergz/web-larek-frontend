@@ -8,7 +8,7 @@ export class Component implements IComponent {
   }
 
   show(): void {
-    this.element.style.display = '';
+    this.element.style.display = 'block';
   }
 
   hide(): void {
