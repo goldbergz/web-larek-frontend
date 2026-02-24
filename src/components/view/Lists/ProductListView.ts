@@ -1,5 +1,5 @@
 import { IProduct } from "../../../types/base/DataTypes";
-import { ProductCardView } from "../ProductCard";
+import { ProductCardView } from "../ProductView/ProductCardView";
 import { List } from "./List";
 
 export class ProductListView extends List<IProduct> {

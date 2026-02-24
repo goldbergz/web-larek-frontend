@@ -6,6 +6,7 @@ import { OrderModel } from './components/model/OrderModel';
 import { ProductModel } from './components/model/ProductModel';
 import { ProductListView } from './components/view/Lists/ProductListView';
 import { ProductModal } from './components/view/Modals/ProductModal';
+import { BasketModal } from './components/view/Modals/BasketModal';
 import './scss/styles.scss';
 import { AppEvents } from './types/base/AppEvents';
 import { IProduct } from './types/base/DataTypes';
@@ -24,9 +25,13 @@ const modalRoot = document.getElementById('modal-container') as HTMLElement;
 const basketCounter = document.querySelector('.header__basket-counter')!;
 const basketButton = document.querySelector('.header__basket')!;
 const cardTemplate = document.getElementById('card-catalog') as HTMLTemplateElement;
+const cardPreviewTemplate = document.getElementById('card-preview') as HTMLTemplateElement;
+const basketTemplate = document.getElementById('basket') as HTMLTemplateElement;
+const basketItemTemplate = document.getElementById('card-basket') as HTMLTemplateElement;
 
 const productListView = new ProductListView(gallery, cardTemplate);
-const productModal = new ProductModal(modalRoot);
+const productModal = new ProductModal(modalRoot, cardPreviewTemplate);
+const basketModal = new BasketModal(modalRoot, basketTemplate, basketItemTemplate);
 
 async function loadProducts() {
   try {
@@ -76,10 +81,34 @@ productModal.onRemoveFromBasket((product) => {
 
 basketModel.addChangeListener(state => {
   basketCounter.textContent = state.items.length.toString();
+  events.emit(AppEvents.BASKET_UPDATED, {
+    items: state.items,
+    totalPrice: state.totalPrice,
+    totalQuantity: state.totalQuantity,
+  });
 });
 
 basketButton.addEventListener('click', () => {
   events.emit(AppEvents.BASKET_OPEN, {});
+});
+
+events.on(AppEvents.BASKET_OPEN, () => {
+  const state = basketModel.getState();
+  basketModal.open();
+  basketModal.updateBasket(state.items);
+});
+
+events.on(AppEvents.BASKET_UPDATED, ({ items }) => {
+  basketModal.updateBasket(items);
+});
+
+basketModal.onRemoveItem((productId: string) => {
+  basketModel.removeProduct(productId);
+  events.emit(AppEvents.PRODUCT_REMOVE_FROM_BASKET, { productId });
+});
+
+basketModal.onSubmit(() => {
+  events.emit(AppEvents.ORDER_START, {});
 });
 
 

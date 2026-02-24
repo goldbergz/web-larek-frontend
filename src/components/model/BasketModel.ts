@@ -51,7 +51,7 @@ export class BasketModel
   
   private calculate(items: IBasketItem[]): IBasketState {
     const totalPrice = items.reduce(
-      (sum, i) => sum + i.product.price,
+      (sum, i) => sum + (i.product.price ?? 0),
       0
     );
 

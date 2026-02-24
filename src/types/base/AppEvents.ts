@@ -7,6 +7,7 @@ export enum AppEvents {
   PRODUCT_REMOVE_FROM_BASKET = 'product:remove_from_basket',
   
   BASKET_OPEN = 'basket:open',
+  BASKET_UPDATED = 'basket:updated',
   
   ORDER_START = 'order:start',
   ORDER_PAYMENT_SET = 'order:payment:set',

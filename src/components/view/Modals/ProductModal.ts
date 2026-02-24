@@ -12,56 +12,84 @@ export class ProductModal
   private removeFromBasketCb?: (product: IProduct) => void;
   private inBasket = false;
 
-  private addButton!: HTMLButtonElement; 
+  private addButton!: HTMLButtonElement;
+  private cardElement?: HTMLElement;
 
-  constructor(element: HTMLElement) {
+  constructor(element: HTMLElement, private template: HTMLTemplateElement) {
     super(element);
-    this.addButton = this.content!.querySelector<HTMLButtonElement>('.card__row button')!;
+  }
+
+  private initView(): void {
+    if (!this.content) {
+      throw new Error('Product modal content element not found');
+    }
+
+    this.content.innerHTML = '';
+
+    const card = this.template.content.firstElementChild!.cloneNode(true) as HTMLElement;
+    this.content.appendChild(card);
+
+    this.cardElement = card;
+
+    const addButton = this.cardElement.querySelector<HTMLButtonElement>('.card__row .button');
+    if (!addButton) {
+      throw new Error('Add-to-basket button not found in product modal template');
+    }
+
+    this.addButton = addButton;
     this.addButton.addEventListener('click', () => this.toggleBasket());
   }
 
-   render(): HTMLElement {
+  render(): HTMLElement {
     return this.element;
   }
 
   setProduct(product: IProduct): void {
+    this.initView();
     this.product = product;
     this.update(product);
     this.open();
   }
 
-    setInBasket(isInBasket: boolean): void {
+  setInBasket(isInBasket: boolean): void {
     this.inBasket = isInBasket;
     this.updateButton();
   }
 
- onAddToBasket(callback: (product: IProduct) => void): void {
+  onAddToBasket(callback: (product: IProduct) => void): void {
     this.addToBasketCb = callback;
   }
 
-   onRemoveFromBasket(callback: (product: IProduct) => void): void {
+  onRemoveFromBasket(callback: (product: IProduct) => void): void {
     this.removeFromBasketCb = callback;
   }
 
-update(data: Partial<IProduct>): HTMLElement {
-    if (!this.product) return this.element;
+  update(data: Partial<IProduct>): HTMLElement {
+    if (!this.product || !this.cardElement) return this.element;
 
-    const category = this.element.querySelector('.card__category')!;
-    const title = this.element.querySelector('.card__title')!;
-    const image = this.element.querySelector('img.card__image') as HTMLImageElement;
-    const price = this.element.querySelector('.card__price')!;
+    const category = this.cardElement.querySelector('.card__category')!;
+    const title = this.cardElement.querySelector('.card__title')!;
+    const image = this.cardElement.querySelector('img.card__image') as HTMLImageElement;
+    const price = this.cardElement.querySelector('.card__price')!;
 
     if (data.category) category.textContent = data.category;
     if (data.title) title.textContent = data.title;
-    if (data.image) image.src = data.image.startsWith('/')
-      ? `${CDN_URL}${data.image}`
-      : data.image;
-    if (data.price !== undefined) price.textContent = `${data.price} синапсов`;
+    if (data.image) {
+      image.src = data.image.startsWith('/')
+        ? `${CDN_URL}${data.image}`
+        : data.image;
+    }
+
+    if (data.price !== undefined && data.price !== null) {
+      price.textContent = `${data.price} синапсов`;
+    } else {
+      price.textContent = 'Бесценно';
+    }
 
     this.updateButton();
 
     return this.element;
-}
+  }
   
   private toggleBasket(): void {
     if (!this.product) return;
@@ -79,6 +107,6 @@ update(data: Partial<IProduct>): HTMLElement {
   private updateButton(): void {
     if (!this.addButton) return;
 
-    this.addButton.textContent = this.inBasket ? 'Удалить из корзины' : 'В корзину';
+    this.addButton.textContent = this.inBasket ? 'Убрать' : 'Добавить';
   }
 }

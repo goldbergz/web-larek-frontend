@@ -19,7 +19,6 @@ export class ApiService extends Api implements IApiService {
     return this.get<IProduct>(`/product/${id}`);
   }
 
-
   async createOrder(order: Order): Promise<OrderResponse> {
     return this.post<OrderResponse>('/order', order, 'POST');
   }

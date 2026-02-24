@@ -1,8 +1,7 @@
-import { IProduct } from "../../types/base/DataTypes";
-import { IDataView } from "../../types/base/View";
-import { IProductCardView } from "../../types/view/ProductCard/ProductCard";
-import { CDN_URL } from "../../utils/constants";
-import { Component } from "./Component";
+import { IProduct } from "../../../types/base/DataTypes";
+import { IDataView } from "../../../types/base/View";
+import { CDN_URL } from "../../../utils/constants";
+import { Component } from "../Component";
 
 export class ProductCardView
   extends Component
@@ -37,7 +36,12 @@ export class ProductCardView
             : data.image;
     }
     
-    if (data.price !== undefined) price.textContent = `${data.price} синапсов`;
+        if (data.price !== undefined && data.price !== null) {
+      price.textContent = `${data.price} синапсов`;
+    } else {
+      price.textContent = 'Бесценно';
+    }
+
 
     return this.element;
   }
