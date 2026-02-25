@@ -1,10 +1,10 @@
-import { IView } from "../../base/View";
+import { IView } from '../../base/View';
 
 export interface IInteractiveElement extends IView {
-  setDisabled(disabled: boolean): void;
-  onClick?(callback: (event: MouseEvent) => void): void;
+	setDisabled(disabled: boolean): void;
+	onClick?(callback: (event: MouseEvent) => void): void;
 }
 
 export interface IButton extends IInteractiveElement {
-  setText(text: string): void;
+	setText(text: string): void;
 }

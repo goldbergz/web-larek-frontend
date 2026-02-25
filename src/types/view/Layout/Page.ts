@@ -1,5 +1,5 @@
-import { IView } from "../../base/View";
+import { IView } from '../../base/View';
 
 export interface IPage extends IView {
-  setContent(content: HTMLElement): void;
+	setContent(content: HTMLElement): void;
 }

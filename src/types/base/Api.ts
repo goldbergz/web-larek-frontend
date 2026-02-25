@@ -1,20 +1,15 @@
 export type ApiListResponse<Type> = {
-    total: number,
-    items: Type[]
+	total: number;
+	items: Type[];
 };
 
 export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 
-
 export interface IApi {
-  baseUrl: string;
+	baseUrl: string;
 
-  get<T>(uri: string): Promise<T>;
-  post<T>(
-    uri: string,
-    data: unknown,
-    method?: ApiPostMethods
-  ): Promise<T>;
+	get<T>(uri: string): Promise<T>;
+	post<T>(uri: string, data: unknown, method?: ApiPostMethods): Promise<T>;
 }
 
 export type ErrorState = {
