@@ -1,6 +1,7 @@
 import { IProduct } from '../../../types/base/DataTypes';
 import { IProductModalView } from '../../../types/view/Modals/ProductModal';
 import { CDN_URL } from '../../../utils/constants';
+import { CATEGORY_CLASS_MAP } from '../ProductView/ProductCardView';
 import { Modal } from './Modal';
 
 export class ProductModal extends Modal implements IProductModalView {
@@ -31,7 +32,7 @@ export class ProductModal extends Modal implements IProductModalView {
 		this.cardElement = card;
 
 		const addButton =
-			this.cardElement.querySelector<HTMLButtonElement>('.card__row .button');
+			this.cardElement.querySelector('.card__row .button') as HTMLButtonElement;
 		if (!addButton) {
 			throw new Error(
 				'Add-to-basket button not found in product modal template'
@@ -69,15 +70,34 @@ export class ProductModal extends Modal implements IProductModalView {
 	update(data: Partial<IProduct>): HTMLElement {
 		if (!this.product || !this.cardElement) return this.element;
 
-		const category = this.cardElement.querySelector('.card__category')!;
-		const title = this.cardElement.querySelector('.card__title')!;
+		const category = this.cardElement.querySelector('.card__category') as HTMLElement;
+		const title = this.cardElement.querySelector('.card__title') as HTMLElement;
 		const image = this.cardElement.querySelector(
 			'img.card__image'
 		) as HTMLImageElement;
-		const price = this.cardElement.querySelector('.card__price')!;
+		const price = this.cardElement.querySelector('.card__price') as HTMLElement;
 
-		if (data.category) category.textContent = data.category;
-		if (data.title) title.textContent = data.title;
+if (data.category && category) {
+      category.textContent = data.category;
+
+			const modifierClasses = [
+				'card__category_soft',
+				'card__category_hard',
+				'card__category_other',
+				'card__category_additional',
+				'card__category_button',
+			];
+
+			category.classList.remove(...modifierClasses);
+
+			const key = data.category.toLowerCase();
+			const modifierClass = CATEGORY_CLASS_MAP[key];
+			if (modifierClass) {
+				category.classList.add(modifierClass);
+			}
+    }
+    
+    if (data.title) title.textContent = data.title;
 		if (data.image) {
 			image.src = data.image.startsWith('/')
 				? `${CDN_URL}${data.image}`

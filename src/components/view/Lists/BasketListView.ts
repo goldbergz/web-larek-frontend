@@ -20,16 +20,16 @@ export class BasketListView
 
 		const element = card.element;
 
-		const indexElement = element.querySelector<HTMLElement>(
+		const indexElement = element.querySelector(
 			'.basket__item-index'
-		);
+		) as HTMLElement;
 		if (indexElement) {
 			indexElement.textContent = String(index + 1);
 		}
 
-		const deleteButton = element.querySelector<HTMLButtonElement>(
+		const deleteButton = element.querySelector(
 			'.basket__item-delete'
-		);
+		) as HTMLButtonElement;
 		if (deleteButton) {
 			deleteButton.addEventListener('click', (event) => {
 				event.stopPropagation();

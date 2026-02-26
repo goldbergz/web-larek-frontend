@@ -45,11 +45,11 @@ export class BasketModal extends Modal implements IBasketModal {
 		this.content.appendChild(basketElement);
 
 		const listContainer =
-			basketElement.querySelector<HTMLElement>('.basket__list');
+			basketElement.querySelector('.basket__list') as HTMLElement;
 		const totalPriceElement =
-			basketElement.querySelector<HTMLElement>('.basket__price');
+			basketElement.querySelector('.basket__price') as HTMLElement;
 		const submitButton =
-			basketElement.querySelector<HTMLButtonElement>('.basket__button');
+			basketElement.querySelector('.basket__button') as HTMLButtonElement;
 
 		if (!listContainer || !totalPriceElement || !submitButton) {
 			throw new Error('Basket modal markup is invalid');

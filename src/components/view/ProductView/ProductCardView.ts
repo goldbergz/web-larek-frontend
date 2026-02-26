@@ -3,6 +3,14 @@ import { IDataView } from '../../../types/base/View';
 import { CDN_URL } from '../../../utils/constants';
 import { Component } from '../Component';
 
+export const CATEGORY_CLASS_MAP: Record<string, string> = {
+	'софт-скил': 'card__category_soft',
+	'хард-скил': 'card__category_hard',
+	'другое': 'card__category_other',
+	'дополнительное': 'card__category_additional',
+	'кнопка': 'card__category_button',
+};
+
 export class ProductCardView extends Component implements IDataView<IProduct> {
 	private product!: IProduct;
 
@@ -11,7 +19,8 @@ export class ProductCardView extends Component implements IDataView<IProduct> {
 			true
 		) as HTMLElement;
 		super(element);
-	}
+  }
+  
 	render(): HTMLElement {
 		return this.element;
 	}
@@ -22,14 +31,32 @@ export class ProductCardView extends Component implements IDataView<IProduct> {
 	}
 
 	update(data: Partial<IProduct>): HTMLElement {
-		const category = this.element.querySelector('.card__category')!;
-		const title = this.element.querySelector('.card__title')!;
+		const category = this.element.querySelector('.card__category') as HTMLElement;
+		const title = this.element.querySelector('.card__title') as HTMLElement;
 		const image = this.element.querySelector(
 			'.card__image'
 		) as HTMLImageElement;
-		const price = this.element.querySelector('.card__price')!;
+		const price = this.element.querySelector('.card__price') as HTMLElement;
 
-		if (data.category) category.textContent = data.category;
+    if (data.category && category) {
+      category.textContent = data.category;
+
+			const modifierClasses = [
+				'card__category_soft',
+				'card__category_hard',
+				'card__category_other',
+				'card__category_additional',
+				'card__category_button',
+			];
+
+			category.classList.remove(...modifierClasses);
+
+			const key = data.category.toLowerCase();
+			const modifierClass = CATEGORY_CLASS_MAP[key];
+			if (modifierClass) {
+				category.classList.add(modifierClass);
+			}
+    }
 		if (data.title) title.textContent = data.title;
 		if (data.image) {
 			image.src = data.image.startsWith('/')

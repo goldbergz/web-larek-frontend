@@ -55,15 +55,15 @@ export class OrderModal extends Modal implements IOrderModal {
 			true
 		) as HTMLFormElement;
 
-		const address = form.querySelector<HTMLInputElement>(
+		const address = form.querySelector(
 			'input[name="address"]'
-		)!;
-		const cardBtn = form.querySelector<HTMLButtonElement>(
+		) as HTMLInputElement;
+		const cardBtn = form.querySelector(
 			'button[name="card"]'
-		)!;
-		const cashBtn = form.querySelector<HTMLButtonElement>(
+		) as HTMLButtonElement;
+		const cashBtn = form.querySelector(
 			'button[name="cash"]'
-		)!;
+		) as HTMLButtonElement;
 
 		let paymentType: PaymentSettings['payment'] | null = null;
 
@@ -105,8 +105,8 @@ export class OrderModal extends Modal implements IOrderModal {
 			true
 		) as HTMLFormElement;
 
-		const email = form.querySelector<HTMLInputElement>('input[name="email"]')!;
-		const phone = form.querySelector<HTMLInputElement>('input[name="phone"]')!;
+		const email = form.querySelector('input[name="email"]') as HTMLInputElement;
+		const phone = form.querySelector('input[name="phone"]') as HTMLInputElement;
 
 		const emitChange = () => {
 			this.paymentContacts = {

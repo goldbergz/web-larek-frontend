@@ -25,9 +25,9 @@ export class ProductBasketView
 		this.priceElement = this.element.querySelector(
 			'.card__price'
 		) as HTMLElement;
-		this.deleteButton = this.element.querySelector<HTMLButtonElement>(
+		this.deleteButton = this.element.querySelector(
 			'.basket__item-delete'
-		);
+		) as HTMLButtonElement;
 	}
 
 	render(): HTMLElement {
