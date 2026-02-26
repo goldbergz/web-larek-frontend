@@ -41,19 +41,19 @@ export interface EventMap {
 	'product:add_to_basket': { product: IProduct };
 	'product:remove_from_basket': { productId: string };
 
-	'basket:open': void;
+	'basket:open': {};
 	'basket:updated': {
 		items: IBasketItem[];
 		totalPrice: number;
 		totalQuantity: number;
 	};
 
-	'order:start': void;
+	'order:start': {};
 	'order:payment:set': PaymentSettings;
 	'order:contacts:set': PaymentContacts;
 	'order:success': { orderId: string; total: number };
 	'order:step:change': OrderData;
 
 	'modal:open': ModalData;
-	'modal:close': void;
+	'modal:close': {};
 }

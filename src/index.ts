@@ -8,13 +8,13 @@ import { ProductListView } from './components/view/Lists/ProductListView';
 import { ProductModal } from './components/view/Modals/ProductModal';
 import { BasketModal } from './components/view/Modals/BasketModal';
 import './scss/styles.scss';
-import { AppEvents } from './types/base/AppEvents';
+import { AppEvents, EventMap } from './types/base/AppEvents';
 import { IProduct } from './types/base/DataTypes';
 import { API_URL } from './utils/constants';
 import { OrderModal } from './components/view/Modals/OrderModal';
 
 const emitter = new EventEmitter();
-const events = new TypedEvents<any>(emitter);
+const events = new TypedEvents<EventMap>(emitter);
 const api = new ApiService(API_URL);
 
 const productModel = new ProductModel();
@@ -65,8 +65,9 @@ async function loadProducts() {
 		productModel.setProducts(products);
 
 		events.emit(AppEvents.PRODUCTS_LOADED, { products });
-	} catch (err: any) {
-		productModel.setError(err.message);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+		productModel.setError(message);
 	}
 }
 
@@ -85,7 +86,6 @@ events.on(
 
 events.on(AppEvents.PRODUCT_SELECTED, ({ productId }) => {
 	const product = productModel.getProductById(productId);
-	console.log(product);
 	if (!product) return;
 	const isInBasket = basketModel.items.some(
 		(item) => item.product.id === product.id
@@ -122,7 +122,8 @@ basketButton.addEventListener('click', () => {
 });
 
 events.on(AppEvents.BASKET_OPEN, () => {
-	const state = basketModel.getState();
+  const state = basketModel.getState();
+  productModal.close();
 	basketModal.open();
 	basketModal.updateBasket(state.items);
 });

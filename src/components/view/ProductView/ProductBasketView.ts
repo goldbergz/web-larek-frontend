@@ -31,8 +31,8 @@ export class ProductBasketView
 	}
 
 	render(): HTMLElement {
-		throw new Error('Method not implemented.');
-	}
+    return this.element;
+  }
 
 	setBasketItem(item: IBasketItem): void {
 		this.basketItem = item;

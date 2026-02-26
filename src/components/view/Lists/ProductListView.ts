@@ -1,8 +1,12 @@
 import { IProduct } from '../../../types/base/DataTypes';
+import { IProductListView } from '../../../types/view/Lists/ProductList';
 import { ProductCardView } from '../ProductView/ProductCardView';
 import { List } from './List';
 
-export class ProductListView extends List<IProduct> {
+export class ProductListView
+  extends List<IProduct>
+  implements IProductListView
+{
 	constructor(container: HTMLElement, private template: HTMLTemplateElement) {
 		super(container);
 	}

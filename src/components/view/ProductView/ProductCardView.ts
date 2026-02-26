@@ -13,7 +13,7 @@ export class ProductCardView extends Component implements IDataView<IProduct> {
 		super(element);
 	}
 	render(): HTMLElement {
-		throw new Error('Method not implemented.');
+		return this.element;
 	}
 
 	setProduct(product: IProduct): void {
