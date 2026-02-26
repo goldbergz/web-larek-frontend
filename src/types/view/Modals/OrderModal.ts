@@ -11,6 +11,5 @@ export interface IOrderModal extends IModal {
 	setContactsData(data: PaymentContacts): void;
 	setSuccessData(total: number): void;
 	onNextStep?(callback: () => void): void;
-	onPreviousStep?(callback: () => void): void;
 	onSubmit?(callback: (data: OrderSettings) => void): void;
 }
