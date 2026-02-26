@@ -4,8 +4,8 @@ import { ProductCardView } from '../ProductView/ProductCardView';
 import { List } from './List';
 
 export class ProductListView
-  extends List<IProduct>
-  implements IProductListView
+	extends List<IProduct>
+	implements IProductListView
 {
 	constructor(container: HTMLElement, private template: HTMLTemplateElement) {
 		super(container);

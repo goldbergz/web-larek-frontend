@@ -65,8 +65,8 @@ async function loadProducts() {
 		productModel.setProducts(products);
 
 		events.emit(AppEvents.PRODUCTS_LOADED, { products });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
+	} catch (err: unknown) {
+		const message = err instanceof Error ? err.message : 'Unknown error';
 		productModel.setError(message);
 	}
 }
@@ -122,8 +122,8 @@ basketButton.addEventListener('click', () => {
 });
 
 events.on(AppEvents.BASKET_OPEN, () => {
-  const state = basketModel.getState();
-  productModal.close();
+	const state = basketModel.getState();
+	productModal.close();
 	basketModal.open();
 	basketModal.updateBasket(state.items);
 });

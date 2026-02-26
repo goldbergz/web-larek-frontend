@@ -31,8 +31,9 @@ export class ProductModal extends Modal implements IProductModalView {
 
 		this.cardElement = card;
 
-		const addButton =
-			this.cardElement.querySelector('.card__row .button') as HTMLButtonElement;
+		const addButton = this.cardElement.querySelector(
+			'.card__row .button'
+		) as HTMLButtonElement;
 		if (!addButton) {
 			throw new Error(
 				'Add-to-basket button not found in product modal template'
@@ -70,15 +71,17 @@ export class ProductModal extends Modal implements IProductModalView {
 	update(data: Partial<IProduct>): HTMLElement {
 		if (!this.product || !this.cardElement) return this.element;
 
-		const category = this.cardElement.querySelector('.card__category') as HTMLElement;
+		const category = this.cardElement.querySelector(
+			'.card__category'
+		) as HTMLElement;
 		const title = this.cardElement.querySelector('.card__title') as HTMLElement;
 		const image = this.cardElement.querySelector(
 			'img.card__image'
 		) as HTMLImageElement;
 		const price = this.cardElement.querySelector('.card__price') as HTMLElement;
 
-if (data.category && category) {
-      category.textContent = data.category;
+		if (data.category && category) {
+			category.textContent = data.category;
 
 			const modifierClasses = [
 				'card__category_soft',
@@ -95,9 +98,9 @@ if (data.category && category) {
 			if (modifierClass) {
 				category.classList.add(modifierClass);
 			}
-    }
-    
-    if (data.title) title.textContent = data.title;
+		}
+
+		if (data.title) title.textContent = data.title;
 		if (data.image) {
 			image.src = data.image.startsWith('/')
 				? `${CDN_URL}${data.image}`

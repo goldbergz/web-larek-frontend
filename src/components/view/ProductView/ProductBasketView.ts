@@ -31,8 +31,8 @@ export class ProductBasketView
 	}
 
 	render(): HTMLElement {
-    return this.element;
-  }
+		return this.element;
+	}
 
 	setBasketItem(item: IBasketItem): void {
 		this.basketItem = item;
