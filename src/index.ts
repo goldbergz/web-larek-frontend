@@ -9,11 +9,12 @@ import { ProductModal } from './components/view/Modals/ProductModal';
 import { BasketModal } from './components/view/Modals/BasketModal';
 import './scss/styles.scss';
 import { AppEvents, EventMap } from './types/base/AppEvents';
-import { IBasketItem, IProduct } from './types/base/DataTypes';
+import { IBasketItem } from './types/base/DataTypes';
 import { API_URL } from './utils/constants';
 import { OrderModal } from './components/view/Modals/OrderModal';
 import { ProductCardView } from './components/view/ProductView/ProductCardView';
 import { ProductBasketView } from './components/view/ProductView/ProductBasketView';
+import { HeaderView } from './components/view/HeaderView';
 
 const emitter = new EventEmitter();
 const events = new TypedEvents<EventMap>(emitter);
@@ -25,8 +26,8 @@ const orderModel = new OrderModel();
 
 const gallery = document.querySelector('.gallery') as HTMLElement;
 const modalRoot = document.getElementById('modal-container') as HTMLElement;
-const basketCounter = document.querySelector('.header__basket-counter')!;
-const basketButton = document.querySelector('.header__basket')!;
+const headerElement = document.querySelector('.header') as HTMLElement;
+
 const cardTemplate = document.getElementById(
 	'card-catalog'
 ) as HTMLTemplateElement;
@@ -45,6 +46,7 @@ const successTemplate = document.getElementById(
 	'success'
 ) as HTMLTemplateElement;
 
+const headerView = new HeaderView(headerElement); 
 const productListView = new ProductListView(gallery);
 const productModal = new ProductModal(modalRoot, cardPreviewTemplate);
 const basketModal = new BasketModal(
@@ -112,7 +114,7 @@ productModal.onRemoveFromBasket((product) => {
 });
 
 basketModel.addChangeListener((state) => {
-	basketCounter.textContent = state.items.length.toString();
+	headerView.setCounter(state.items.length); 
 	events.emit(AppEvents.BASKET_UPDATED, {
 		items: state.items,
 		totalPrice: state.totalPrice,
@@ -120,8 +122,8 @@ basketModel.addChangeListener((state) => {
 	});
 });
 
-basketButton.addEventListener('click', () => {
-	events.emit(AppEvents.BASKET_OPEN, {});
+headerView.onBasketClick(() => {
+  events.emit(AppEvents.BASKET_OPEN, {});
 });
 
 function buildBasketElements(items: IBasketItem[]): HTMLElement[] {

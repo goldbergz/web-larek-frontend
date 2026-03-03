@@ -52,7 +52,6 @@ export class ProductModal extends Modal implements IProductModalView {
 		this.initView();
 		this.product = product;
 		this.update(product);
-		this.open();
 	}
 
 	setInBasket(isInBasket: boolean): void {
