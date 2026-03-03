@@ -73,6 +73,9 @@ export class ProductModal extends Modal implements IProductModalView {
 		const category = this.cardElement.querySelector(
 			'.card__category'
 		) as HTMLElement;
+		const description = this.cardElement.querySelector(
+			'.card__text'
+		) as HTMLElement;
 		const title = this.cardElement.querySelector('.card__title') as HTMLElement;
 		const image = this.cardElement.querySelector(
 			'img.card__image'
@@ -98,7 +101,9 @@ export class ProductModal extends Modal implements IProductModalView {
 				category.classList.add(modifierClass);
 			}
 		}
-
+		if (data.description && description) {
+			description.textContent = data.description;
+		}
 		if (data.title) title.textContent = data.title;
 		if (data.image) {
 			image.src = data.image.startsWith('/')
