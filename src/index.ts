@@ -46,13 +46,10 @@ const successTemplate = document.getElementById(
 	'success'
 ) as HTMLTemplateElement;
 
-const headerView = new HeaderView(headerElement); 
+const headerView = new HeaderView(headerElement);
 const productListView = new ProductListView(gallery);
 const productModal = new ProductModal(modalRoot, cardPreviewTemplate);
-const basketModal = new BasketModal(
-	modalRoot,
-	basketTemplate
-);
+const basketModal = new BasketModal(modalRoot, basketTemplate);
 const orderModal = new OrderModal(
 	modalRoot,
 	orderTemplate,
@@ -77,16 +74,16 @@ async function loadProducts() {
 loadProducts();
 
 events.on(AppEvents.PRODUCTS_LOADED, ({ products }) => {
-  const elements = products.map((product) => {
-    const card = new ProductCardView(cardTemplate);
-    card.setProduct(product);
-    card.element.addEventListener('click', () => {
-      events.emit(AppEvents.PRODUCT_SELECTED, { productId: product.id });
-    });
-    return card.element;
-  });
+	const elements = products.map((product) => {
+		const card = new ProductCardView(cardTemplate);
+		card.setProduct(product);
+		card.element.addEventListener('click', () => {
+			events.emit(AppEvents.PRODUCT_SELECTED, { productId: product.id });
+		});
+		return card.element;
+	});
 
-  productListView.setElements(elements);
+	productListView.setElements(elements);
 });
 
 events.on(AppEvents.PRODUCT_SELECTED, ({ productId }) => {
@@ -114,7 +111,7 @@ productModal.onRemoveFromBasket((product) => {
 });
 
 basketModel.addChangeListener((state) => {
-	headerView.setCounter(state.items.length); 
+	headerView.setCounter(state.items.length);
 	events.emit(AppEvents.BASKET_UPDATED, {
 		items: state.items,
 		totalPrice: state.totalPrice,
@@ -123,47 +120,53 @@ basketModel.addChangeListener((state) => {
 });
 
 headerView.onBasketClick(() => {
-  events.emit(AppEvents.BASKET_OPEN, {});
+	events.emit(AppEvents.BASKET_OPEN, {});
 });
 
 function buildBasketElements(items: IBasketItem[]): HTMLElement[] {
-  return items.map((item, index) => {
-    const card = new ProductBasketView(basketItemTemplate);
-    card.setBasketItem(item);
-    const el = card.element;
+	return items.map((item, index) => {
+		const card = new ProductBasketView(basketItemTemplate);
+		card.setBasketItem(item);
+		const el = card.element;
 
-    const indexEl = el.querySelector('.basket__item-index') as HTMLElement;
-    if (indexEl) indexEl.textContent = String(index + 1);
+		const indexEl = el.querySelector('.basket__item-index') as HTMLElement;
+		if (indexEl) indexEl.textContent = String(index + 1);
 
-    const deleteBtn = el.querySelector('.basket__item-delete') as HTMLButtonElement;
-    if (deleteBtn) {
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        basketModel.removeProduct(item.product.id);
-      });
-    }
+		const deleteBtn = el.querySelector(
+			'.basket__item-delete'
+		) as HTMLButtonElement;
+		if (deleteBtn) {
+			deleteBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				basketModel.removeProduct(item.product.id);
+			});
+		}
 
-    return el;
-  });
+		return el;
+	});
 }
 
 events.on(AppEvents.BASKET_OPEN, () => {
 	const state = basketModel.getState();
 	productModal.close();
-const elements = buildBasketElements(state.items);
-  basketModal.updateBasket(elements, state.totalPrice, state.items.length === 0);
-  basketModal.open();});
-
-events.on(AppEvents.BASKET_UPDATED, ({ items, totalPrice }) => {
-if (!basketModal.isOpen()) return;
-
-  const elements = buildBasketElements(items);
-  basketModal.updateBasket(elements, totalPrice, items.length === 0);
+	const elements = buildBasketElements(state.items);
+	basketModal.updateBasket(
+		elements,
+		state.totalPrice,
+		state.items.length === 0
+	);
+	basketModal.open();
 });
 
+events.on(AppEvents.BASKET_UPDATED, ({ items, totalPrice }) => {
+	if (!basketModal.isOpen()) return;
+
+	const elements = buildBasketElements(items);
+	basketModal.updateBasket(elements, totalPrice, items.length === 0);
+});
 
 modalRoot.addEventListener('basket:submit', () => {
-  events.emit(AppEvents.ORDER_START, {});
+	events.emit(AppEvents.ORDER_START, {});
 });
 
 events.on(AppEvents.ORDER_START, () => {

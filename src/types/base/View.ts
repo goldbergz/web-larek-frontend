@@ -26,6 +26,6 @@ export interface IModal<T = unknown> extends IDataView<T> {
 }
 
 export interface IList {
-  update(elements: Partial<HTMLElement[]>): HTMLElement;
-  render(): HTMLElement;
+	update(elements: Partial<HTMLElement[]>): HTMLElement;
+	render(): HTMLElement;
 }

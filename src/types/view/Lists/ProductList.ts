@@ -1,3 +1,3 @@
 export interface IProductListView {
-  setElements(elements: HTMLElement[]): void;
+	setElements(elements: HTMLElement[]): void;
 }

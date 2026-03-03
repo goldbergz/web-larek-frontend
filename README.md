@@ -2,7 +2,7 @@
 
 Веб-ларек - это современный интернет-магазин, специализирующийся на товарах для веб-разработчиков. Проект представляет собой полнофункциональное SPA-приложение с каталогом товаров, корзиной покупок и многошаговым оформлением заказа.
 
-Ключевая особенность проекта — чёткое разделение **View-компонентов**, **моделей данных**, **контроллеров** и **событийной системы**, что делает код прозрачным, тестируемым и легко расширяемым.
+Главная особенность: строгая **архитектура MVP + Event Bus**, где модели, представления и сервисы взаимодействуют через события. Это повышает читаемость, тестируемость и расширяемость проекта.
 
 
 #### Стек: HTML, SCSS, TS, Webpack
@@ -50,15 +50,18 @@ yarn build
 ```
 
 ## Архитектура проекта
-Взаимодействия внутри приложения происходят через события. Модели инициализируют события, слушатели событий в основном коде выполняют передачу данных компонентам отображения, а также вычислениями между этой передачей, и еще они меняют значения в моделях.
 
-Проект реализован по архитектурному подходу MVP + Event Bus, где:
-
-- Model — классы хранения состояния
-- View — классы отображения
-- Presenter — index.ts и связанные контроллеры
+- Model — реактивные модели данных (ProductModel, BasketModel, OrderModel)
+- View — компоненты отображения (карточки, списки, модалки)
+- Presenter — контроллер, точка входа (index.ts)
 - Service (API) — классы для HTTP-запросов
-- Events — событийная система для связи компонентов
+- Event Bus — слабосвязанная система событий для взаимодействия компонентов
+
+Взаимодействие через события:
+
+1. Модели генерируют события при изменении состояния
+2. Слушатели в презентере обрабатывают данные и обновляют view
+3. View вызывает события по действиям пользователя
 
 ## Базовые типы и классы (src/types/base/)
 ### Класс ```Api```
@@ -106,12 +109,15 @@ POST | PUT | DELETE
 - для хранения текста ошибки
 - для отображения ошибок во view
 
-### События приложения (AppEvents.ts)
+### Событийная система (Event Bus)
+
+В проекте реализован Event Bus с типизацией через ```EventMap``` и ```TypedEvents```. Это позволяет безопасно работать с событиями и данными между компонентами без жёсткой связки.
+
 ```AppEvents``` - перечисление всех событий, которыми общаются:
 - модели
 - view-компоненты
 - контроллер
-- модальные окна
+
 
 Также обеспечивает слабую связанность между частями приложения.
 
@@ -136,6 +142,9 @@ POST | PUT | DELETE
 - MODAL_OPEN - открывает конкретное модальное окно.
 - MODAL_CLOSE - закрывает конкретное модальное окно
 
+```EventMap```
+
+EventMap описывает структуру данных для каждого события. Это позволяет TypeScript проверять, что при вызове emit и подписке on передаются корректные данные.
 
 ```ModalData``` - тип передаваемых данных при открытии любой модалки.
 
@@ -228,16 +237,11 @@ POST | PUT | DELETE
 ### Класс ```ProductModel```
 
 **Назначение:**
-Хранит каталог товаров и предоставляет доступ к данным.
+Хранит список товаров, состояние загрузки и ошибки
 
 **Конструктор**
 
 ```constructor()```
-
-**Поля**
-- products: IProduct[] — список товаров
-- isLoading: boolean - состояние загрузки
-- error?: string - возможные ошибки с сервера для их отображения
 
 **Методы**
 - ```setProducts(products: IProduct[]): void``` — устанавливает каталог
@@ -249,16 +253,11 @@ POST | PUT | DELETE
 ### Класс ```BasketModel```
 
 **Назначение:**
-Хранит состояние корзины и управляет товарами.
+Хранит товары корзины, общую цену и количество
 
 **Конструктор**
 
 ```constructor()```
-
-**Поля**
-- items: IBasketItem[] - массив товаров
-- totalPrice: number - общая стоимость всех отваров в корзине
-- totalQuantity: number - общее количество товаров в корзине
 
 **Методы**
 - ```addProduct(product: IProduct): void``` - добавляет товары в корзину
@@ -295,10 +294,6 @@ POST | PUT | DELETE
 ### Класс ```ApiService extends Api```
 **Назначение:**
 Сервисный слой для работы с бизнес-данными приложения.
-
-**Конструктор**
-
-```constructor(baseUrl: string, options: RequestInit = {})```
 
 **Параметры конструктора:**
 - baseUrl: string — базовый URL сервера
@@ -356,15 +351,12 @@ POST | PUT | DELETE
 - close() - скрывает модалку
 - isOpen(): boolean - проверяет состояние
 
-```IList<T>``` - отображение массивов данных. Переиспользуемый список для каталога и корзины.
+```IList``` - отображение массивов данных. Переиспользуемый список для каталога и корзины.
 
-Свойства:
--items: T[] - элементы списка
 
 Методы:
-- setItems(items: T[]) - задать новые элементы
-- getItems(): T[] - получить текущие элементы
-- onItemClick?(cb) - обработка клика по элементу (открытие модалки в каталоге)
+- update(elements: Partial<HTMLElement[]>): HTMLElement;
+- render(): HTMLElement;
 
 ### Конкретные классы представления
 ```ProductListView```
@@ -374,15 +366,13 @@ POST | PUT | DELETE
 
 **Конструктор**
 
-```constructor(container: HTMLElement, template: HTMLTemplateElement)```
+```constructor(container: HTMLElement)```
 
 **Параметры конструктора**
 - container: HTMLElement — DOM-элемент, в котором отображается каталог
-- template: HTMLTemplateElement — шаблон карточки товара
 
 **Методы**
-- ```setItems(products: IProduct[]): void``` — рендерит каталог
-- ```onProductClick(cb): void``` — обработка клика по товару
+- ```setElements(elements: HTMLElement[]): void``` — рендерит каталог
 
 ```ProductCardView```
 
@@ -395,10 +385,17 @@ POST | PUT | DELETE
 ```constructor(template: HTMLTemplateElement)```
 
 **Параметры**
-- template: HTMLTemplateElement — шаблон разметки карточки товара
+- product: IProduct - объект продукта
+- categoryElement: HTMLElement - категрия продукта
+- titleElement: HTMLElement - название продукта
+- imageElement: HTMLImageElement - фото продукта
+- priceElement: HTMLElement - цена продукта
 
 **Методы**
 - ```setProduct(product: IProduct): void```
+- ```update(data: Partial<IProduct>): HTMLElement```
+- ```getId(): string```
+- ```getProduct(): IProduct```
 
 ```ProductModal```
 
@@ -410,7 +407,7 @@ POST | PUT | DELETE
 
 **Конструктор**
 
-```constructor(modalElement: HTMLElement, template: HTMLTemplateElement)```
+```constructor(element: HTMLElement, private template: HTMLTemplateElement)```
 
 **Методы**
 - ```setProduct(product: IProduct): void``` - показать данные товара в модалке
@@ -426,16 +423,11 @@ POST | PUT | DELETE
 
 **Конструктор**
 
-```constructor(container: HTMLElement, template: HTMLTemplateElement)```
-
-**Параметры конструктора**
-- container: HTMLElement — DOM-элемент, в который рендерится список товаров корзины
-- template: HTMLTemplateElement — шаблон элемента корзины
+```constructor(container: HTMLElement)```
 
 
 **Методы**
-- ```onRemoveItem(cb): void``` - удалить товар
-- ```onUpdateQuantity(cb): void``` - изменение количества
+- ```setElements(elements: HTMLElement[]): void``` - рендер
 
 ```BasketModal```
 
@@ -446,19 +438,18 @@ POST | PUT | DELETE
 **Конструктор**
 
 ```constructor(
-  modalElement: HTMLElement,
-  basketTemplate: HTMLTemplateElement,
-  itemTemplate: HTMLTemplateElement
-)```
+  element: HTMLElement,
+		private basketTemplate: HTMLTemplateElement
+)
+```
 
 **Параметры конструктора**
-- modalElement: HTMLElement — корневой DOM-элемент модалки
-- basketTemplate: HTMLTemplateElement — шаблон корзины
-- itemTemplate: HTMLTemplateElement — шаблон элемента корзины
+- listView: BasketListView - лист товаров в корзине
+- totalPriceElement: HTMLElement - общая сумма товаров в корзине
+- submitButton: HTMLButtonElement - кнопки отправки формы, начала оформления заказа
 
 **Методы**
 - ```updateBasket(items: IBasketItem[]): void``` - обновить отображение корзны
-- ```onUpdateTotalSum(cb): void``` - коллбэк при пересчёте суммы
 
 ```OrderModal```
 
@@ -473,7 +464,8 @@ POST | PUT | DELETE
   orderTemplate: HTMLTemplateElement,
   contactsTemplate: HTMLTemplateElement,
   successTemplate: HTMLTemplateElement
-)```
+)
+```
 
 **Методы**
 - ```setStep(step: 'payment' | 'contacts' | 'success'): void``` - переключить шаг оформления
@@ -483,6 +475,25 @@ POST | PUT | DELETE
 - ```onNextStep(cb): void``` - переход на следующий шаг
 - ```onSubmit(cb): void``` - отправка заказа, переход на окно success
 
+```HeaderView```
+
+**Назначение:**
+
+Отображает шапку сайта с кнопкой корзины и счётчиком количества товаров. Компонент инкапсулирует работу с DOM-элементами шапки и обеспечивает реакцию на клик по корзине.
+
+**Конструктор**
+
+```constructor(container: HTMLElement)```
+
+**Поля:**
+- basketButton — кнопка корзины в шапке.
+- basketCounter — элемент, отображающий количество товаров в корзине.
+- basketClickCb — коллбэк на клик по кнопке корзины.
+
+**Методы:**
+- ```setCounter(count: number): void``` — обновляет отображаемое количество товаров в корзине.
+- ```onBasketClick(callback: () => void): void``` — задаёт обработчик клика по корзине.
+- ```render(): HTMLElement``` — возвращает корневой DOM-элемент компонента.
 
 ## Взаимодействие всех типов между собой
 
@@ -501,16 +512,14 @@ POST | PUT | DELETE
 6. BasketModel.clear
 
 ### Просмотр товара
-1. Пользователь кликает по карточке товара
-2. ProductListView вызывает PRODUCT_SELECTED
-3. Презентер получает товар из ProductModel
-4. Открывается ProductModalView
+1. Клик на карточку → PRODUCT_SELECTED
+2. Презентер получает товар из ProductModel
+3. Открытие ProductModal
 
 ### Добавление товара в корзину
-1. Пользователь нажимает «Добавить в корзину»
-2. ProductModalView генерирует PRODUCT_ADD_TO_BASKET
-3. BasketModel.addProduct()
-4. Генерируется BASKET_UPDATE
+1. Клик "Добавить" → PRODUCT_ADD_TO_BASKET
+2. BasketModel.addProduct()
+3. Генерация BASKET_UPDATE
 5. Обновляются:
 - Header
 - BasketModal
