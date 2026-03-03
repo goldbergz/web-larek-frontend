@@ -1,30 +1,17 @@
-import { IBasketItem } from '../../../types/base/DataTypes';
 import { IBasketModal } from '../../../types/view/Modals/BasketModal';
 import { BasketListView } from '../Lists/BasketListView';
 import { Modal } from './Modal';
 
 export class BasketModal extends Modal implements IBasketModal {
-	private basketTemplate: HTMLTemplateElement;
-	private itemTemplate: HTMLTemplateElement;
-
 	private listView?: BasketListView;
 	private totalPriceElement?: HTMLElement;
 	private submitButton?: HTMLButtonElement;
 
-	private items: IBasketItem[] = [];
-
-	private updateTotalSumCb?: (sum: number) => void;
-	private submitCb?: () => void;
-	private removeItemCb?: (productId: string) => void;
-
 	constructor(
 		element: HTMLElement,
-		basketTemplate: HTMLTemplateElement,
-		itemTemplate: HTMLTemplateElement
+		private basketTemplate: HTMLTemplateElement,
 	) {
 		super(element);
-		this.basketTemplate = basketTemplate;
-		this.itemTemplate = itemTemplate;
 	}
 
 	render(): HTMLElement {
@@ -58,60 +45,31 @@ export class BasketModal extends Modal implements IBasketModal {
 			throw new Error('Basket modal markup is invalid');
 		}
 
-		this.listView = new BasketListView(listContainer, this.itemTemplate);
-		this.totalPriceElement = totalPriceElement;
-		this.submitButton = submitButton;
-
-		if (this.removeItemCb) {
-			this.listView.onRemoveItem?.(this.removeItemCb);
-		}
+		this.listView = new BasketListView(listContainer);
 
 		this.submitButton.addEventListener('click', () => {
-			if (!this.submitButton || this.submitButton.disabled) return;
-			this.submitCb?.();
+			if (this.submitButton?.disabled) return;
+			this.element.dispatchEvent(new CustomEvent('basket:submit', { bubbles: true }));
 		});
 	}
 
-	updateBasket(items: IBasketItem[]): void {
-		this.items = items;
-		if (!this.isOpen() && !this.listView) {
-			return;
-		}
+  updateBasket(elements: HTMLElement[], totalPrice: number, isEmpty: boolean): void {
+     if (!this.listView) {
+      this.initView();
+     }
+    
+		this.listView!.setElements(elements);
 
-		if (!this.listView) {
-			this.initView();
-		}
+    if (this.totalPriceElement) {
+      this.totalPriceElement.textContent = `${totalPrice} синапсов`;
+    }
 
-		this.listView!.setItems(this.items);
-
-		const total = this.items.reduce(
-			(sum, item) => sum + (item.product.price ?? 0),
-			0
-		);
-
-		if (this.totalPriceElement) {
-			this.totalPriceElement.textContent = `${total} синапсов`;
-		}
-
-		if (this.submitButton) {
-			this.submitButton.disabled = items.length === 0;
-		}
-
-		this.updateTotalSumCb?.(total);
+    if (this.submitButton) {
+      this.submitButton.disabled = isEmpty;
+    }
 	}
 
-	onUpdateTotalSum(callback: (sum: number) => void): void {
-		this.updateTotalSumCb = callback;
-	}
-
-	onSubmit(callback: () => void): void {
-		this.submitCb = callback;
-	}
-
-	onRemoveItem(callback: (productId: string) => void): void {
-		this.removeItemCb = callback;
-		if (this.listView) {
-			this.listView.onRemoveItem?.(callback);
-		}
-	}
+	update(data: Partial<unknown>): HTMLElement {
+    return this.element;
+  }
 }

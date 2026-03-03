@@ -25,10 +25,7 @@ export interface IModal<T = unknown> extends IDataView<T> {
 	isOpen(): boolean;
 }
 
-export interface IList<T> extends IDataView<T[]> {
-	items: T[];
-
-	setItems(items: T[]): void;
-	getItems(): T[];
-	onItemClick?(callback: (item: T, index: number) => void): void;
+export interface IList {
+  update(elements: Partial<HTMLElement[]>): HTMLElement;
+  render(): HTMLElement;
 }
