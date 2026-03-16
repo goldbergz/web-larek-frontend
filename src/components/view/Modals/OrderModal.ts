@@ -65,11 +65,11 @@ export class OrderModal extends Modal implements IOrderModal {
 			'button[name="cash"]'
 		) as HTMLButtonElement;
 
-		let paymentType: PaymentSettings['payment'] | null = null;
+		let paymentType: PaymentSettings['payment'] | undefined;
 
 		const emitChange = () => {
 			this.paymentSettings = {
-				payment: paymentType ?? 'online',
+				payment: paymentType as PaymentSettings['payment'],
 				address: address.value,
 			};
 
@@ -78,19 +78,17 @@ export class OrderModal extends Modal implements IOrderModal {
 
 		cardBtn.onclick = () => {
 			paymentType = 'online';
-			cardBtn.classList.add('button_alt-active');
-			cashBtn.classList.remove('button_alt-active');
 			emitChange();
 		};
 
 		cashBtn.onclick = () => {
 			paymentType = 'upon receipt';
-			cashBtn.classList.add('button_alt-active');
-			cardBtn.classList.remove('button_alt-active');
 			emitChange();
 		};
 
-		address.oninput = emitChange;
+		address.oninput = () => {
+			emitChange();
+		};
 
 		form.onsubmit = (e) => {
 			e.preventDefault();
@@ -152,13 +150,28 @@ export class OrderModal extends Modal implements IOrderModal {
 	setPaymentData(
 		data: PaymentSettings & { valid?: boolean; errors?: string[] }
 	): void {
-		const btn = this.content?.querySelector<HTMLButtonElement>(
-			'button[type="submit"]'
+		const cardBtn = this.content?.querySelector<HTMLButtonElement>(
+			'button[name="card"]'
+		);
+		const cashBtn = this.content?.querySelector<HTMLButtonElement>(
+			'button[name="cash"]'
 		);
 		const err = this.content?.querySelector<HTMLElement>('.form__errors');
 
-		if (btn && data.valid !== undefined) btn.disabled = !data.valid;
-		if (err && data.errors) err.textContent = data.errors.join(', ');
+		cardBtn?.classList.remove('button_alt-active');
+		cashBtn?.classList.remove('button_alt-active');
+
+		if (data.payment === 'online') {
+			cardBtn?.classList.add('button_alt-active');
+		}
+
+		if (data.payment === 'upon receipt') {
+			cashBtn?.classList.add('button_alt-active');
+		}
+
+		if (err && data.errors) {
+			err.textContent = data.errors.join(', ');
+		}
 	}
 
 	setContactsData(
@@ -171,6 +184,16 @@ export class OrderModal extends Modal implements IOrderModal {
 
 		if (btn && data.valid !== undefined) btn.disabled = !data.valid;
 		if (err && data.errors) err.textContent = data.errors.join(', ');
+	}
+
+	setValid(value: boolean) {
+		const btn = this.content?.querySelector<HTMLButtonElement>(
+			'button[type="submit"]'
+		);
+
+		if (btn) {
+			btn.disabled = !value;
+		}
 	}
 
 	onPaymentChange(cb: (data: PaymentSettings) => void) {

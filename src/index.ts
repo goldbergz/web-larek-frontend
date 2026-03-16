@@ -181,12 +181,13 @@ orderModal.onPaymentChange((data) => {
 	orderModel.setPaymentSettings(data);
 
 	const valid = orderModel.validatePayment();
+	const state = orderModel.getState();
 
 	orderModal.setPaymentData({
-		...data,
-		valid,
-		errors: orderModel.getState().validationErrors.map((e) => e.message),
+		...state.paymentSettings!,
+		errors: state.validationErrors.map((e) => e.message),
 	});
+	orderModal.setValid(valid);
 });
 
 orderModal.onNextStep(() => {
