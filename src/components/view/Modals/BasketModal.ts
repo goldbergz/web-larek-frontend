@@ -66,9 +66,7 @@ export class BasketModal extends Modal implements IBasketModal {
 		totalPrice: number,
 		isEmpty: boolean
 	): void {
-		if (!this.listView) {
-			this.initView();
-		}
+		this.initView();
 
 		this.listView!.setElements(elements);
 

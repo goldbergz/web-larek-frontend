@@ -144,8 +144,9 @@ function buildBasketElements(items: IBasketItem[]): HTMLElement[] {
 }
 
 events.on(AppEvents.BASKET_OPEN, () => {
-	const state = basketModel.getState();
 	productModal.close();
+	orderModal.close();
+	const state = basketModel.getState();
 	const elements = buildBasketElements(state.items);
 	basketModal.updateBasket(
 		elements,

@@ -36,6 +36,9 @@ export abstract class Modal extends DataView<unknown> implements IModal {
 		this.toggleClass('modal_active', false);
 		this.pageWrapper?.classList.remove('page__wrapper_locked');
 		this._isOpen = false;
+		if (this.content) {
+			this.content.innerHTML = '';
+		}
 	}
 
 	isOpen(): boolean {
