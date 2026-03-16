@@ -15,6 +15,7 @@ import { OrderModal } from './components/view/Modals/OrderModal';
 import { ProductCardView } from './components/view/ProductView/ProductCardView';
 import { ProductBasketView } from './components/view/ProductView/ProductBasketView';
 import { HeaderView } from './components/view/HeaderView';
+import { SuccessModal } from './components/view/Modals/SuccessModal';
 
 const emitter = new EventEmitter();
 const events = new TypedEvents<EventMap>(emitter);
@@ -50,12 +51,8 @@ const headerView = new HeaderView(headerElement);
 const productListView = new ProductListView(gallery);
 const productModal = new ProductModal(modalRoot, cardPreviewTemplate);
 const basketModal = new BasketModal(modalRoot, basketTemplate);
-const orderModal = new OrderModal(
-	modalRoot,
-	orderTemplate,
-	contactsTemplate,
-	successTemplate
-);
+const orderModal = new OrderModal(modalRoot, orderTemplate, contactsTemplate);
+const successModal = new SuccessModal(modalRoot, successTemplate);
 
 async function loadProducts() {
 	try {
@@ -222,8 +219,10 @@ orderModal.onSubmit(async (data) => {
 		basketModel.clear();
 		orderModel.reset();
 
-		orderModal.setStep('success');
-		orderModal.setSuccessData(res.total);
+		orderModal.close();
+
+		successModal.showSuccess(res.total);
+		successModal.open();
 	} catch (err) {
 		alert(err);
 	}
@@ -231,9 +230,4 @@ orderModal.onSubmit(async (data) => {
 
 events.on(AppEvents.ORDER_STEP_CHANGE, ({ step }) => {
 	orderModal.setStep(step);
-});
-
-events.on(AppEvents.ORDER_SUCCESS, ({ total }) => {
-	orderModal.setStep('success');
-	orderModal.setSuccessData(total);
 });

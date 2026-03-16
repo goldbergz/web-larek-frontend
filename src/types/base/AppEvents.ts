@@ -32,7 +32,7 @@ export interface ModalData {
 
 export interface OrderData {
 	order: Order;
-	step: 'payment' | 'contacts' | 'success';
+	step: 'payment' | 'contacts';
 }
 
 export interface EventMap {

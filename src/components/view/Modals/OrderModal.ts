@@ -9,12 +9,11 @@ import { Modal } from './Modal';
 export class OrderModal extends Modal implements IOrderModal {
 	private orderTemplate: HTMLTemplateElement;
 	private contactsTemplate: HTMLTemplateElement;
-	private successTemplate: HTMLTemplateElement;
 
 	private paymentSettings?: PaymentSettings;
 	private paymentContacts?: PaymentContacts;
 
-	private step: 'payment' | 'contacts' | 'success' = 'payment';
+	private step: 'payment' | 'contacts' = 'payment';
 	private paymentChangeCb?: (data: PaymentSettings) => void;
 	private contactsChangeCb?: (data: PaymentContacts) => void;
 	private nextStepCb?: () => void;
@@ -23,20 +22,18 @@ export class OrderModal extends Modal implements IOrderModal {
 	constructor(
 		element: HTMLElement,
 		orderTemplate: HTMLTemplateElement,
-		contactsTemplate: HTMLTemplateElement,
-		successTemplate: HTMLTemplateElement
+		contactsTemplate: HTMLTemplateElement
 	) {
 		super(element);
 		this.orderTemplate = orderTemplate;
 		this.contactsTemplate = contactsTemplate;
-		this.successTemplate = successTemplate;
 	}
 
 	render(): HTMLElement {
 		return this.element;
 	}
 
-	setStep(step: 'payment' | 'contacts' | 'success'): void {
+	setStep(step: 'payment' | 'contacts'): void {
 		this.step = step;
 		this.renderStep();
 	}
@@ -47,7 +44,6 @@ export class OrderModal extends Modal implements IOrderModal {
 
 		if (this.step === 'payment') this.renderPayment();
 		if (this.step === 'contacts') this.renderContacts();
-		if (this.step === 'success') this.renderSuccess();
 	}
 
 	private renderPayment(): void {
@@ -128,23 +124,6 @@ export class OrderModal extends Modal implements IOrderModal {
 		};
 
 		this.content!.appendChild(form);
-	}
-
-	private renderSuccess(): void {
-		const el = this.successTemplate.content.firstElementChild!.cloneNode(
-			true
-		) as HTMLElement;
-
-		el.querySelector('.order-success__close')?.addEventListener('click', () =>
-			this.close()
-		);
-
-		this.content!.appendChild(el);
-	}
-
-	setSuccessData(total: number): void {
-		const desc = this.content?.querySelector('.order-success__description');
-		if (desc) desc.textContent = `Списано ${total} синапсов`;
 	}
 
 	setPaymentData(
